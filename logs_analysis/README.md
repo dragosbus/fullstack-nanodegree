@@ -19,3 +19,27 @@ This is the third project for the Udacity Full Stack Nanodegree. In this project
 4. Create a new user with name vagrant(```sudo -u postgres createuser vagrant```)
 5. Create a new database with name news(```createdb news```)
 6. Import data drom sql file in news database(```psql -d db_name -f query_file.sql```)
+
+## Create views for project
+
+1. ```articles_views``` view contains article title and view
+
+```
+drop view article_views;
+create view article_views as
+    select articles.author, articles.title, paths_views.views
+    from (
+        select path, count(*) as views
+        from log
+        where status = '200 OK'
+        group by path
+    ) as paths_views
+    right join articles
+        on paths_views.path like ('/article/' || articles.slug);
+```
+
+2. ```daily_error_date``` view to support "On which days did more than 1% of requests lead to errors?"
+
+## How to run the app?
+
+```python3 app.py```
