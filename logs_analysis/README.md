@@ -40,6 +40,24 @@ create view article_views as
 
 2. ```daily_error_date``` view to support "On which days did more than 1% of requests lead to errors?"
 
+```
+drop view daily_error_date;
+create view daily_error_date as
+    select daily_request.date, round(daily_error.error_request * 100.0 / daily_request.total_request, 2) as error_rate
+    from (
+        select time::date as date, count(*) as total_request
+        from log
+        group by date
+    ) as daily_request
+        join (
+        select time::date as date, count(*) as error_request
+        from log
+        where status != '200 OK'
+        group by date
+    ) as daily_error
+        on daily_request.date = daily_error.date;
+```
+
 ## How to run the app?
 
 ```python3 app.py```
